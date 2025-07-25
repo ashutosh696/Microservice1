@@ -26,7 +26,7 @@ public class PatientController {
     public List<Patient> getAllPatients() {
         for (Patient p : patients) {
             List<Services> services = p.getServiceIds().stream()
-                    .map(id -> restTemplate.getForObject("http://localhost:8082/services/" + id, Services.class))
+                    .map(id -> restTemplate.getForObject("http://service-service/services/" + id, Services.class))
                     .toList();
             p.setServices(services);
         }
