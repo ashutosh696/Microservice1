@@ -1,5 +1,6 @@
 package com.ashu.Microservice1.controller;
 
+import com.ashu.Microservice1.client.ServiceClient;
 import com.ashu.Microservice1.model.Patient;
 import com.ashu.Microservice1.model.Services;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -17,7 +18,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/patients")
 public class PatientController {
-
+    @Autowired
+     private ServiceClient serviceClient;
     @Autowired
     private RestTemplate restTemplate;
 
@@ -62,4 +64,20 @@ public class PatientController {
         return patients;
 
     }
+
+    @GetMapping("/getAllFeign")
+    public List<Patient> getAllFeign()  {
+        System.out.println("Patient MS");
+
+        for (Patient p : patients) {
+            List<Services> services = p.getServiceIds().stream()
+                    .map(serviceClient::getById)
+                    .toList();
+            p.setServices(services);
+        }
+
+        return patients;
+    }
+   
+
 }
