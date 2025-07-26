@@ -8,6 +8,10 @@ public class Services {
     public Services() {
     }
 
+    public Services(String name) {
+        this.name = name;
+    }
+
     public Services(int id, String name, double cost) {
         this.id = id;
         this.name = name;

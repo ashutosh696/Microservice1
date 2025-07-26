@@ -2,12 +2,15 @@ package com.ashu.Microservice1.controller;
 
 import com.ashu.Microservice1.model.Patient;
 import com.ashu.Microservice1.model.Services;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -23,6 +26,7 @@ public class PatientController {
     );
 
     @GetMapping
+    @CircuitBreaker(name="serviceServiceBreaker", fallbackMethod = "fallbackMethod")
     public List<Patient> getAllPatients() {
         for (Patient p : patients) {
             List<Services> services = p.getServiceIds().stream()
@@ -31,5 +35,17 @@ public class PatientController {
             p.setServices(services);
         }
         return patients;
+    }
+
+    public List<Patient> fallbackMethod(Throwable t) {
+        System.out.println("fallbackMethod"+t.getMessage());
+
+        for (Patient p : patients) {
+
+          //  p.setServices(Collections.emptyList());
+            p.setServices(List.of(new Services("Service is not available now, Please try after sometime!!")));
+        }
+        return patients;
+
     }
 }
