@@ -3,6 +3,7 @@ package com.ashu.Microservice1.controller;
 import com.ashu.Microservice1.model.Patient;
 import com.ashu.Microservice1.model.Services;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,8 +27,10 @@ public class PatientController {
     );
 
     @GetMapping
-    @CircuitBreaker(name="serviceServiceBreaker", fallbackMethod = "fallbackMethod")
+   // @CircuitBreaker(name="serviceServiceBreaker", fallbackMethod = "fallbackMethod")
+    @Retry(name="serviceRetry", fallbackMethod = "fallbackMethodRetry")
     public List<Patient> getAllPatients() {
+        System.out.println("Patient MS");
         for (Patient p : patients) {
             List<Services> services = p.getServiceIds().stream()
                     .map(id -> restTemplate.getForObject("http://service-service/services/" + id, Services.class))
@@ -37,12 +40,23 @@ public class PatientController {
         return patients;
     }
 
-    public List<Patient> fallbackMethod(Throwable t) {
+    /*public List<Patient> fallbackMethod(Throwable t) {
         System.out.println("fallbackMethod"+t.getMessage());
 
         for (Patient p : patients) {
 
           //  p.setServices(Collections.emptyList());
+            p.setServices(List.of(new Services("Service is not available now, Please try after sometime!!")));
+        }
+        return patients;
+
+    }*/
+    public List<Patient> fallbackMethodRetry(Throwable t) {
+        System.out.println("fallbackMethod Retry: "+t.getMessage());
+
+        for (Patient p : patients) {
+
+            //  p.setServices(Collections.emptyList());
             p.setServices(List.of(new Services("Service is not available now, Please try after sometime!!")));
         }
         return patients;

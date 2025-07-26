@@ -11,17 +11,22 @@ eureka:
       defaultZone: http://localhost:8761/eureka
 
 resilience4j:
+  retry:
+    instances:
+      serviceRetry:
+        max-attempts: 3
+        wait-duration: 2s
+        retry-exceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - java.io.IOException
+
   circuitbreaker:
     instances:
-      serviceServiceBreaker:
-        failureRateThreshold: 50
-        minimumNumberOfCalls: 5
-        slidingWindowSize: 10
-        waitDurationInOpenState: 10s
-        permittedNumberOfCallsInHalfOpenState: 3
-        record-exceptions:
-          - org.springframework.web.client.ResourceAccessException
-          - java.net.ConnectException
+      serviceCircuitBreaker:
+        sliding-window-size: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        register-health-indicator: true
 
 
 management:
