@@ -35,7 +35,7 @@ public class PatientController {
         System.out.println("Patient MS");
         for (Patient p : patients) {
             List<Services> services = p.getServiceIds().stream()
-                    .map(id -> restTemplate.getForObject("http://service-service/services/" + id, Services.class))
+                    .map(id -> restTemplate.getForObject("http://services-service/services/" + id, Services.class))
                     .toList();
             p.setServices(services);
         }

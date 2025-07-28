@@ -1,39 +1,6 @@
-server:
-  port: 8081
-
 spring:
   application:
     name: patient-service
 
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-
-resilience4j:
-  retry:
-    instances:
-      serviceRetry:
-        max-attempts: 3
-        wait-duration: 2s
-        retry-exceptions:
-          - org.springframework.web.client.ResourceAccessException
-          - java.io.IOException
-
-  circuitbreaker:
-    instances:
-      serviceCircuitBreaker:
-        sliding-window-size: 5
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10s
-        register-health-indicator: true
-
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,resilience4j.circuitbreaker
-  endpoint:
-    health:
-      show-details: always
+  config:
+    import: optional:configserver:http://localhost:8888
